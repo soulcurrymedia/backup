@@ -352,6 +352,11 @@ shared_examples "a subclass of Syncer::Cloud::Base" do
       end
 
       it "logs and raises error on upload failure" do
+        if Thread.respond_to?(:report_on_exception)
+          # Don't print $stderr message for this spec
+          Thread.report_on_exception = false
+        end
+
         cloud_io.stubs(:upload).raises("upload failure")
         Backup::Logger.expects(:error).at_least_once.with do |err|
           expect(err.message).to eq "upload failure"
